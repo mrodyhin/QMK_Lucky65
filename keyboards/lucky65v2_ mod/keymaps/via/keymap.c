@@ -40,7 +40,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_LSFT,   KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,               KC_UP,      KC_PGDN,
         KC_LCTL,   KC_LGUI, KC_LALT,                            KC_SPC,KC_SPC,KC_SPC,                        MO(_LF), KC_RCTL,    KC_LEFT,   KC_DOWN,    KC_RGHT),
 
-    [ _LF] = LAYOUT( /* Base */
+    [_LF] = LAYOUT( /* Base */
         EE_CLR,    KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  RGB_TOG, _______,KC_MUTE,
         TO(_LM),   IM_BT1,  IM_BT2,  IM_BT3,  IM_2G4,  IM_USB, _______,  _______, _______, _______, KC_PSCR, _______, _______, RGB_MOD, _______,
         _______,   _______, _______, _______, _______, _______, KC_SCRL, KC_PAUS, KC_HOME, KC_END,  _______, _______, RGB_HUI,          _______,
@@ -138,27 +138,30 @@ void bat_indicators_hook(uint8_t index) {
             rgb_matrix_blink_set_interval_times(index, 500, 0x3);
             bat_blink = true;
             bat_statue = BAT_LOW;
-        } else {
+        }
+        else {
             bat_blink = false;
         }
 
         if ((bts_info.bt_info.pvol < 1U) && (!mm_eeconfig.charging)) {
             if (laste_time_off == 0) laste_time_off = timer_read();
-            if (timer_elapsed(laste_time_off)>10000) {
-                laste_time_off=0;
+            if (timer_elapsed(laste_time_off) > 10000) {
+                laste_time_off = 0;
                 im_set_power_off();
             }
-        } else {
+        }
+        else {
             laste_time_off = 0;
         }
-    } else {
+    }
+    else {
         bat_blink = false;
     }
 
     rgb_matrix_blink_set(index);
 }
 
-bool rgb_matrix_blink_user(blink_rgb_t *blink_rgb) {
+bool rgb_matrix_blink_user(blink_rgb_t* blink_rgb) {
     if (blink_rgb->index == RGB_MATRIX_BLINK_INDEX_BAT) {
         if (bat_blink != true) {
             return false;
@@ -171,14 +174,14 @@ bool rgb_matrix_blink_user(blink_rgb_t *blink_rgb) {
 typedef union {
     uint32_t raw;
     struct {
-        uint8_t flag: 1;
-        uint8_t rgb_enable: 1;
-        uint8_t no_gui: 1;
-        uint8_t rgb_status: 1;
-        uint8_t layer: 3;
-        uint8_t rgb_hsv_index: 3;
+        uint8_t flag : 1;
+        uint8_t rgb_enable : 1;
+        uint8_t no_gui : 1;
+        uint8_t rgb_status : 1;
+        uint8_t layer : 3;
+        uint8_t rgb_hsv_index : 3;
         uint8_t rgb_brightness;
-        uint8_t Num_To_F1: 1;
+        uint8_t Num_To_F1 : 1;
 
     };
 } confinfo_t;
@@ -188,21 +191,21 @@ confinfo_t confinfo;
 
 // 此函数不需要改动
 bool mm_get_rgb_enable(void) {
-#    ifdef RGBLIGHT_ENABLE
+    #    ifdef RGBLIGHT_ENABLE
     return confinfo.rgb_enable;
-#    else
+    #    else
     return rgb_matrix_config.enable;
-#    endif
+    #    endif
 }
 
 // 此函数不需要改动
 void mm_set_rgb_enable(bool state) {
-#    ifdef RGBLIGHT_ENABLE
+    #    ifdef RGBLIGHT_ENABLE
     confinfo.rgb_enable = state;
     eeconfig_update_user(confinfo.raw);
-#    else
+    #    else
     rgb_matrix_config.enable = state;
-#    endif
+    #    endif
 }
 #endif
 
@@ -256,9 +259,9 @@ bool im_init_user(void) {
         eeconfig_confinfo_default();
     }
     readbat = timer_read32();
-#ifdef RGB_MATRIX_BLINK_INDEX_BAT
+    #ifdef RGB_MATRIX_BLINK_INDEX_BAT
     rgb_matrix_blink_set(RGB_MATRIX_BLINK_INDEX_BAT);
-#endif
+    #endif
 
     return true;
 }
@@ -282,7 +285,7 @@ bool im_loop_user(void) {
         battery_full_flag = readPin(FULL_PIN);
     }
 
-    if ((!mm_eeconfig.charging) && full_flag ) {
+    if ((!mm_eeconfig.charging) && full_flag) {
         full_flag = false;
     }
 
@@ -315,62 +318,55 @@ void rgb_matrix_enable_user(void) {
 
 bool im_mm_rgb_blink_hook_user(uint8_t index, mm_linker_rgb_t state) {
 
-#if defined(RGB_MATRIX_BLINK_ENABLE) && defined(MULTIMODE_ENABLE)
+    #if defined(RGB_MATRIX_BLINK_ENABLE) && defined(MULTIMODE_ENABLE)
     switch (state) {
-        case mlrs_lback_succeed:
-        case mlrs_pair_succeed: {
-            im_mm_rgb_blink_set_state(mlrs_none);
-            return true;
-        } break;
+    case mlrs_lback_succeed:
+    case mlrs_pair_succeed: {
+        im_mm_rgb_blink_set_state(mlrs_none);
+        return true;
+    } break;
 
-        default:
-            break;
+    default:
+        break;
     }
-#endif
+    #endif
 
     return true;
 }
 
-void Change_To_Layer_move_fun(uint8_t Layer_num )
-{
-    if(confinfo.Num_To_F1 == 0)
-    {
+void Change_To_Layer_move_fun(uint8_t Layer_num) {
+    if (confinfo.Num_To_F1 == 0) {
         layer_move((Layer_num + 1));
     }
-    else
-    {
+    else {
         layer_move((Layer_num + 2));
     }
 
 }
 
-const uint8_t f1_12_keycode[]=
-{KC_F1,KC_F2,KC_F3,KC_F4,KC_F5,KC_F6,KC_F7,KC_F8,KC_F9,KC_F10,KC_F11,KC_F12};
-volatile uint8_t Fn_key_press_Page = 0 ;
-bool im_process_record_user(uint16_t keycode, keyrecord_t *record) {
+const uint8_t f1_12_keycode[] =
+{ KC_F1,KC_F2,KC_F3,KC_F4,KC_F5,KC_F6,KC_F7,KC_F8,KC_F9,KC_F10,KC_F11,KC_F12 };
+volatile uint8_t Fn_key_press_Page = 0;
+bool im_process_record_user(uint16_t keycode, keyrecord_t* record) {
     switch (keycode) {
     case EE_CLR:
     {
 
-        if(record->event.pressed)
-        {
-            if((Fn_key_press_Page)&&(Shift_key_press))
-            {
+        if (record->event.pressed) {
+            if ((Fn_key_press_Page) && (Shift_key_press)) {
                 unregister_code16(KC_RIGHT_SHIFT);
                 unregister_code16(KC_LEFT_SHIFT);
 
                 register_code16(KC_GRV);
 
-                KC_GRV_key_Release_flag =1;
+                KC_GRV_key_Release_flag = 1;
                 return false;
             }
         }
-        else
-        {
-            if(KC_GRV_key_Release_flag == 1)
-            {
+        else {
+            if (KC_GRV_key_Release_flag == 1) {
                 unregister_code16(KC_GRV);
-                KC_GRV_key_Release_flag=0;
+                KC_GRV_key_Release_flag = 0;
                 return false;
             }
         }
@@ -380,13 +376,11 @@ bool im_process_record_user(uint16_t keycode, keyrecord_t *record) {
     break;
     case MO(_LF):
     {
-        if (record->event.pressed)
-        {
+        if (record->event.pressed) {
             Change_To_Layer_move_fun(0);
             Fn_key_press_Page = 1;
         }
-        else
-        {
+        else {
             Fn_key_press_Page = 0;
             layer_move(confinfo.layer);
         }
@@ -395,13 +389,11 @@ bool im_process_record_user(uint16_t keycode, keyrecord_t *record) {
     break;
     case MO(_LMF):
     {
-        if (record->event.pressed)
-        {
+        if (record->event.pressed) {
             Change_To_Layer_move_fun(3);
             Fn_key_press_Page = 2;
         }
-        else
-        {
+        else {
             Fn_key_press_Page = 0;
             layer_move(confinfo.layer);
         }
@@ -415,30 +407,27 @@ bool im_process_record_user(uint16_t keycode, keyrecord_t *record) {
         return true;
     }
     break;
-    case KC_ESC:{
+    case KC_ESC: {
 
-            if (record->event.pressed)
-            {
-                if(Shift_key_press == 1 )
-                {
-                    register_code16(KC_GRV);
-                    KC_GRV_key_Release_flag =1;
-                     return false;
-                }
-
+        if (record->event.pressed) {
+            if (Shift_key_press == 1) {
+                register_code16(KC_GRV);
+                KC_GRV_key_Release_flag = 1;
+                return false;
             }
-            else
-            {
-                if(KC_GRV_key_Release_flag == 1){
-                    unregister_code16(KC_GRV);
-                    KC_GRV_key_Release_flag=0;
-                    return false;
-                }
 
+        }
+        else {
+            if (KC_GRV_key_Release_flag == 1) {
+                unregister_code16(KC_GRV);
+                KC_GRV_key_Release_flag = 0;
+                return false;
             }
+
+        }
         return true;
     }
-    break;
+               break;
 
     case KC_1:
     case KC_2:
@@ -451,70 +440,69 @@ bool im_process_record_user(uint16_t keycode, keyrecord_t *record) {
     case KC_9:
     case KC_0:
     {
-            if(confinfo.Num_To_F1 ==true){
-                if (record->event.pressed) {
-                        register_code16(f1_12_keycode[keycode-KC_1 ]);
-                    } else {
-                        unregister_code16(f1_12_keycode[keycode-KC_1 ]);
-                    }
-                    return false;
+        if (confinfo.Num_To_F1 == true) {
+            if (record->event.pressed) {
+                register_code16(f1_12_keycode[keycode - KC_1]);
             }
+            else {
+                unregister_code16(f1_12_keycode[keycode - KC_1]);
+            }
+            return false;
+        }
     }
-        return true;
+    return true;
     break;
     case KC_MINS:
-     {
-            if(confinfo.Num_To_F1 ==true){
-                if (record->event.pressed) {
-                        register_code16(KC_F11);
-                    } else {
-                        unregister_code16(KC_F11);
-                    }
-                    return false;
+    {
+        if (confinfo.Num_To_F1 == true) {
+            if (record->event.pressed) {
+                register_code16(KC_F11);
             }
+            else {
+                unregister_code16(KC_F11);
+            }
+            return false;
+        }
     }
-        return true;
+    return true;
     break;
     case KC_EQL:
     {
-            if(confinfo.Num_To_F1 ==true){
-                if (record->event.pressed) {
-                        register_code16(KC_F12);
-                    } else {
-                        unregister_code16(KC_F12);
-                    }
-                    return false;
+        if (confinfo.Num_To_F1 == true) {
+            if (record->event.pressed) {
+                register_code16(KC_F12);
             }
+            else {
+                unregister_code16(KC_F12);
+            }
+            return false;
+        }
     }
-        return true;
+    return true;
     break;
     case NUM_TOF1:
-        if (record->event.pressed)
-        {
+        if (record->event.pressed) {
             confinfo.Num_To_F1 = !confinfo.Num_To_F1;
             eeconfig_update_user(confinfo.raw);
-            if(Fn_key_press_Page == 1)
-            {
+            if (Fn_key_press_Page == 1) {
                 Change_To_Layer_move_fun(0);
             }
-            else if(Fn_key_press_Page == 2)
-            {
+            else if (Fn_key_press_Page == 2) {
                 Change_To_Layer_move_fun(3);
             }
         }
         return false;
-    break;
+        break;
     case KC_LGUI: {
-        if (record->event.pressed)
-        {
-            if(confinfo.no_gui)
-            return false;
+        if (record->event.pressed) {
+            if (confinfo.no_gui)
+                return false;
             else
-            return true;
+                return true;
         }
     }break;
     case GU_TOGG: {
-        if(record->event.pressed){
+        if (record->event.pressed) {
             confinfo.no_gui = !confinfo.no_gui;
             eeconfig_update_user(confinfo.raw);
         }
@@ -523,16 +511,17 @@ bool im_process_record_user(uint16_t keycode, keyrecord_t *record) {
     case RGB_HUI:
         if (record->event.pressed) {
             uint8_t now_mode_one = rgb_matrix_get_mode();
-            if((now_mode_one == 6) ||(now_mode_one == 13) ||(now_mode_one == 15) ||(now_mode_one == 16) ||(now_mode_one == 25) ||(now_mode_one == 26) ||(now_mode_one == 34)){
+            if ((now_mode_one == 6) || (now_mode_one == 13) || (now_mode_one == 15) || (now_mode_one == 16) || (now_mode_one == 25) || (now_mode_one == 26) || (now_mode_one == 34)) {
                 confinfo.rgb_hsv_index = (confinfo.rgb_hsv_index + 1) % 6;
                 rgb_matrix_sethsv(rgb_hsvs[confinfo.rgb_hsv_index][0],
-                                    rgb_hsvs[confinfo.rgb_hsv_index][1],
-                                    rgb_matrix_get_val());
-            }else{
+                    rgb_hsvs[confinfo.rgb_hsv_index][1],
+                    rgb_matrix_get_val());
+            }
+            else {
                 confinfo.rgb_hsv_index = (confinfo.rgb_hsv_index + 1) % 7;
                 rgb_matrix_sethsv(rgb_hsvs[confinfo.rgb_hsv_index][0],
-                                    rgb_hsvs[confinfo.rgb_hsv_index][1],
-                                    rgb_matrix_get_val());
+                    rgb_hsvs[confinfo.rgb_hsv_index][1],
+                    rgb_matrix_get_val());
             }
             eeconfig_update_user(confinfo.raw);
         }
@@ -541,16 +530,17 @@ bool im_process_record_user(uint16_t keycode, keyrecord_t *record) {
     case RGB_HUD:
         if (record->event.pressed) {
             uint8_t now_mode_one = rgb_matrix_get_mode();
-            if((now_mode_one == 6) ||(now_mode_one == 13) ||(now_mode_one == 15) ||(now_mode_one == 16) ||(now_mode_one == 25) ||(now_mode_one == 26) ||(now_mode_one == 34)){
-                (confinfo.rgb_hsv_index == 0)? (confinfo.rgb_hsv_index = 5):(confinfo.rgb_hsv_index = confinfo.rgb_hsv_index - 1);
+            if ((now_mode_one == 6) || (now_mode_one == 13) || (now_mode_one == 15) || (now_mode_one == 16) || (now_mode_one == 25) || (now_mode_one == 26) || (now_mode_one == 34)) {
+                (confinfo.rgb_hsv_index == 0) ? (confinfo.rgb_hsv_index = 5) : (confinfo.rgb_hsv_index = confinfo.rgb_hsv_index - 1);
                 rgb_matrix_sethsv(rgb_hsvs[confinfo.rgb_hsv_index][0],
-                                    rgb_hsvs[confinfo.rgb_hsv_index][1],
-                                    rgb_matrix_get_val());
-            }else{
-                (confinfo.rgb_hsv_index == 0)? (confinfo.rgb_hsv_index = 6):(confinfo.rgb_hsv_index = confinfo.rgb_hsv_index - 1);
+                    rgb_hsvs[confinfo.rgb_hsv_index][1],
+                    rgb_matrix_get_val());
+            }
+            else {
+                (confinfo.rgb_hsv_index == 0) ? (confinfo.rgb_hsv_index = 6) : (confinfo.rgb_hsv_index = confinfo.rgb_hsv_index - 1);
                 rgb_matrix_sethsv(rgb_hsvs[confinfo.rgb_hsv_index][0],
-                                    rgb_hsvs[confinfo.rgb_hsv_index][1],
-                                    rgb_matrix_get_val());
+                    rgb_hsvs[confinfo.rgb_hsv_index][1],
+                    rgb_matrix_get_val());
 
             }
             eeconfig_update_user(confinfo.raw);
@@ -558,8 +548,8 @@ bool im_process_record_user(uint16_t keycode, keyrecord_t *record) {
         return false;
         break;
     case RGB_MOD: {
-        if(record->event.pressed){
-            if(rgb_matrix_get_mode() == 31) {
+        if (record->event.pressed) {
+            if (rgb_matrix_get_mode() == 31) {
                 rgb_matrix_mode(33);
                 return false;
             }
@@ -567,8 +557,8 @@ bool im_process_record_user(uint16_t keycode, keyrecord_t *record) {
         return true;
     }break;
     case RGB_RMOD: {
-        if(record->event.pressed){
-            if(rgb_matrix_get_mode() == 33) {
+        if (record->event.pressed) {
+            if (rgb_matrix_get_mode() == 33) {
                 rgb_matrix_mode(31);
                 return false;
             }
@@ -576,7 +566,7 @@ bool im_process_record_user(uint16_t keycode, keyrecord_t *record) {
         return true;
     }break;
 
-    case IM_BATQ:{
+    case IM_BATQ: {
         return (mm_eeconfig.devs != DEVS_USB);
     }break;
 
@@ -612,7 +602,7 @@ bool im_process_record_user(uint16_t keycode, keyrecord_t *record) {
         return false;
     } break;
     default:
-    break;
+        break;
     }
     return true;
 }
@@ -620,29 +610,29 @@ bool im_process_record_user(uint16_t keycode, keyrecord_t *record) {
 bool im_lkey_process_user(uint16_t keycode, bool pressed) {
 
     switch (keycode) {
-        case TO(_LB): {
-            if (pressed) {
-                rgb_matrix_blink_set_interval_times(IM_MM_RGB_BLINK_INDEX_W2M, 250, 1);
-                rgb_matrix_blink_set(IM_MM_RGB_BLINK_INDEX_W2M);
-                set_single_persistent_default_layer(_LB);
-                confinfo.layer = _LB;
+    case TO(_LB): {
+        if (pressed) {
+            rgb_matrix_blink_set_interval_times(IM_MM_RGB_BLINK_INDEX_W2M, 250, 1);
+            rgb_matrix_blink_set(IM_MM_RGB_BLINK_INDEX_W2M);
+            set_single_persistent_default_layer(_LB);
+            confinfo.layer = _LB;
             eeconfig_update_user(confinfo.raw);
 
-            }
-            return false;
-        } break;
-        case TO(_LM): {
-            if (pressed) {
-                rgb_matrix_blink_set_interval_times(IM_MM_RGB_BLINK_INDEX_W2M, 250, 3);
-                rgb_matrix_blink_set(IM_MM_RGB_BLINK_INDEX_W2M);
-                set_single_persistent_default_layer(_LM);
-                confinfo.layer = _LM;
-                confinfo.no_gui = false;
-                eeconfig_update_user(confinfo.raw);
+        }
+        return false;
+    } break;
+    case TO(_LM): {
+        if (pressed) {
+            rgb_matrix_blink_set_interval_times(IM_MM_RGB_BLINK_INDEX_W2M, 250, 3);
+            rgb_matrix_blink_set(IM_MM_RGB_BLINK_INDEX_W2M);
+            set_single_persistent_default_layer(_LM);
+            confinfo.layer = _LM;
+            confinfo.no_gui = false;
+            eeconfig_update_user(confinfo.raw);
 
-            }
-            return false;
-        } break;
+        }
+        return false;
+    } break;
 
     }
     return true;
@@ -657,7 +647,7 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
 
 
     if (host_keyboard_led_state().caps_lock) {
-        rgb_matrix_set_color(38, 0xff, 0xff, 0xff);
+        rgb_matrix_set_color(36, 0xff, 0xff, 0xff);
     }
 
     if ((!battery_chrg_flag) && (!full_flag)) {
@@ -667,9 +657,8 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         bat_statue = BAT_CHRGING;
     }
 
-    if (confinfo.no_gui)
-    {
-        rgb_matrix_set_color(4, 0xff, 0xff, 0xff);
+    if (confinfo.no_gui) {
+        rgb_matrix_set_color(2, 0xff, 0xff, 0xff);
 
     }
     return true;
