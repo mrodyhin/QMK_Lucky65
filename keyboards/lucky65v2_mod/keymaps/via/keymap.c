@@ -407,27 +407,27 @@ bool im_process_record_user(uint16_t keycode, keyrecord_t* record) {
         return true;
     }
     break;
-    case KC_ESC: {
+    // case KC_ESC: {
 
-        if (record->event.pressed) {
-            if (Shift_key_press == 1) {
-                register_code16(KC_GRV);
-                KC_GRV_key_Release_flag = 1;
-                return false;
-            }
+    //     if (record->event.pressed) {
+    //         if (Shift_key_press == 1) {
+    //             register_code16(KC_GRV);
+    //             KC_GRV_key_Release_flag = 1;
+    //             return false;
+    //         }
 
-        }
-        else {
-            if (KC_GRV_key_Release_flag == 1) {
-                unregister_code16(KC_GRV);
-                KC_GRV_key_Release_flag = 0;
-                return false;
-            }
+    //     }
+    //     else {
+    //         if (KC_GRV_key_Release_flag == 1) {
+    //             unregister_code16(KC_GRV);
+    //             KC_GRV_key_Release_flag = 0;
+    //             return false;
+    //         }
 
-        }
-        return true;
-    }
-               break;
+    //     }
+    //     return true;
+    // }
+    //            break;
 
     case KC_1:
     case KC_2:
