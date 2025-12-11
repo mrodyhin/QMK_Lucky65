@@ -108,8 +108,8 @@ blink_rgb_t blink_rgbs[RGB_MATRIX_BLINK_COUNT] = {
 
 #ifndef MATRIX_LKEY_DISABLE
 im_lkey_t lkey_define_user[IM_LKEY_COUNT] = {
-    {.keycode = TO(_LB), .hole_time = 3000}, // 参数：按键值，长按时间
-    {.keycode = TO(_LM), .hole_time = 3000}, // 参数：按键值，长按时间
+    {.keycode = TO(_LB), .hole_time = 3000}, // 参数：按键值，长按时间 // Parameter: key value, long press time
+    {.keycode = TO(_LM), .hole_time = 3000}, // 参数：按键值，长按时间 // Parameter: key value, long press time
 };
 #endif
 
@@ -190,6 +190,7 @@ confinfo_t confinfo;
 #ifdef RGB_MATRIX_ENABLE
 
 // 此函数不需要改动
+// This function does not need to be modified
 bool mm_get_rgb_enable(void) {
     #    ifdef RGBLIGHT_ENABLE
     return confinfo.rgb_enable;
@@ -199,6 +200,7 @@ bool mm_get_rgb_enable(void) {
 }
 
 // 此函数不需要改动
+// This function does not need to be modified
 void mm_set_rgb_enable(bool state) {
     #    ifdef RGBLIGHT_ENABLE
     confinfo.rgb_enable = state;
@@ -236,6 +238,7 @@ bool im_led_init_user() {
 }
 
 // 初始化一些GPIO PIN 相关的操作
+// Initialize some GPIO PIN related operations
 bool im_pre_init_user(void) {
     setPinInputHigh(CHRG_PIN);
     setPinOutput(RGB_DRIVER_EN_PIN);
@@ -248,6 +251,7 @@ bool im_pre_init_user(void) {
 
 static uint32_t readbat = 0x00;
 // 初始化和参数相关的操作，在恢复出厂设置时此函数会被调用
+// Initialize and parameter related operations, this function will be called when restoring factory settings
 bool im_init_user(void) {
     setPinOutput(RGB_DRIVER_EN_PIN);
     writePin(RGB_DRIVER_EN_PIN, 1);
@@ -267,6 +271,7 @@ bool im_init_user(void) {
 }
 
 // 恢复出厂设置回调函数
+// Restore factory settings callback function
 bool im_reset_settings_user(void) {
 
     rgb_matrix_blink_set_color(RGB_MATRIX_BLINK_INDEX_ALL, RGB_MATRIX_MAXIMUM_BRIGHTNESS, 0x0, 0x0);
@@ -277,6 +282,7 @@ bool im_reset_settings_user(void) {
 }
 bool chrg_flag = false;
 // 无限循环
+// Infinite loop
 bool im_loop_user(void) {
 
     if (timer_elapsed32(readbat) >= 3000) {
@@ -575,6 +581,7 @@ bool im_process_record_user(uint16_t keycode, keyrecord_t* record) {
         return false;
     }break;
     case US_TS1: { // 低频
+        // Low frequency
         if (record->event.pressed) {
             bts_send_vendor(0x60);
             bts_rf_send_carrier(0, 5, 0x01);
@@ -582,6 +589,7 @@ bool im_process_record_user(uint16_t keycode, keyrecord_t* record) {
         return false;
     } break;
     case US_TS2: { // 中频
+        // Middle frequency
         if (record->event.pressed) {
             bts_send_vendor(0x60);
             bts_rf_send_carrier(19, 5, 0x01);
@@ -589,6 +597,7 @@ bool im_process_record_user(uint16_t keycode, keyrecord_t* record) {
         return false;
     } break;
     case US_TS3: { // 高频
+        // High frequency
         if (record->event.pressed) {
             bts_send_vendor(0x60);
             bts_rf_send_carrier(38, 5, 0x01);
@@ -596,6 +605,7 @@ bool im_process_record_user(uint16_t keycode, keyrecord_t* record) {
         return false;
     } break;
     case US_STOP: { // 停止
+        // Stop
         if (record->event.pressed) {
             bts_rf_send_stop();
         } break;
