@@ -9,7 +9,7 @@
 // uint8_t KC_GRV_key_Release_flag = 0;
 enum layers {
     _LAYOUT_DEFAULT = 0,
-    _LAYOUT_FUNCTION,
+    _LAYOUT_1,
     _LAYOUT_2,
     _LAYOUT_3,
     _LAYOUT_4,
@@ -17,7 +17,7 @@ enum layers {
     _LAYOUT_6,
     _LAYOUT_7,
     _LAYOUT_8,
-    _LAYOUT_9
+    _LAYOUT_FUNCTION,
 };
 
 #define RGB_HSV_MAX 7
@@ -44,12 +44,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         KC_LSFT,   KC_Z,    KC_X,    KC_C,    KC_V,    KC_B,    KC_N,    KC_M,    KC_COMM, KC_DOT,  KC_SLSH, KC_RSFT,               KC_UP,      KC_END,
         KC_LCTL,   KC_LGUI, KC_LALT,                            KC_SPC,KC_SPC,KC_SPC,                        MO(_LAYOUT_FUNCTION), KC_RCTL,    KC_LEFT,   KC_DOWN,    KC_RGHT),
 
-    [_LAYOUT_FUNCTION] = LAYOUT(
-        EE_CLR,    KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  RGB_TOG, _______,KC_MUTE,
-        _______,   IM_BT1,  IM_BT2,  IM_BT3,  IM_2G4,  IM_USB, _______,  _______, _______, _______, KC_PSCR, _______, _______, RGB_MOD, _______,
-        _______,   _______, _______, _______, _______, _______, KC_SCRL, KC_PAUS, KC_HOME, KC_END,  _______, _______, RGB_HUI,          _______,
-        _______,   _______,  _______,  _______,  _______, _______, _______, _______, _______, _______, _______, _______,          RGB_VAI, QK_BOOT,
-        NUM_TOF1,   GU_TOGG, _______,                            IM_BATQ,IM_BATQ,IM_BATQ,                            _______, _______, RGB_SPD, RGB_VAD, RGB_SPI),
+    [_LAYOUT_1] = LAYOUT(
+        _______,    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,_______,
+        _______,   _______,  _______,  _______,  _______,  _______, _______,  _______, _______, _______, _______, _______, _______, _______, _______,
+        _______,   _______, _______, _______, _______, _______, _______, _______, _______, _______,  _______, _______, _______,          _______,
+        _______,   _______,  _______,  _______,  _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______,
+        _______,   _______, _______,                            _______,_______,_______,                            _______, _______, _______, _______, _______),
 
     [_LAYOUT_2] = LAYOUT(
         _______,    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,_______,
@@ -100,12 +100,12 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
         _______,   _______,  _______,  _______,  _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______,
         _______,   _______, _______,                            _______,_______,_______,                            _______, _______, _______, _______, _______),
 
-    [_LAYOUT_9] = LAYOUT(
-        _______,    _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,_______,
-        _______,   _______,  _______,  _______,  _______,  _______, _______,  _______, _______, _______, _______, _______, _______, _______, _______,
-        _______,   _______, _______, _______, _______, _______, _______, _______, _______, _______,  _______, _______, _______,          _______,
-        _______,   _______,  _______,  _______,  _______, _______, _______, _______, _______, _______, _______, _______,          _______, _______,
-        _______,   _______, _______,                            _______,_______,_______,                            _______, _______, _______, _______, _______),
+    [_LAYOUT_FUNCTION] = LAYOUT(
+        EE_CLR,    KC_F1,   KC_F2,   KC_F3,   KC_F4,   KC_F5,   KC_F6,   KC_F7,   KC_F8,   KC_F9,   KC_F10,  KC_F11,  KC_F12,  RGB_TOG, KC_NO,KC_MUTE,
+        KC_NO,     IM_BT1,  IM_BT2,  IM_BT3,  IM_2G4,  IM_USB, KC_NO,    KC_NO,   KC_NO,   KC_NO,   KC_PSCR, KC_NO,   KC_NO,   RGB_MOD, KC_NO,
+        KC_NO,     KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_SCRL, KC_PAUS, KC_HOME, KC_END,  KC_NO,   KC_NO,   RGB_HUI,          KC_NO,
+        KC_NO,     KC_NO,   KC_NO,    KC_NO,    KC_NO,   QK_BOOT,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,   KC_NO,          RGB_VAI, KC_NO,
+        KC_NO,     KC_NO,   KC_NO,                              IM_BATQ,IM_BATQ,IM_BATQ,              KC_NO,   KC_NO,   RGB_SPD, RGB_VAD, RGB_SPI),
 };
 
 #ifdef ENCODER_MAP_ENABLE
@@ -133,8 +133,6 @@ blink_rgb_t blink_rgbs[RGB_MATRIX_BLINK_COUNT] = {
     {.index = IM_MM_RGB_BLINK_INDEX_BT2, .interval = 250, .times = 1, .color = {.r = 0x00, .g = 0xFF, .b = 0x00}, .blink_cb = im_mm_rgb_blink_cb},
     {.index = IM_MM_RGB_BLINK_INDEX_BT3, .interval = 250, .times = 1, .color = {.r = 0x00, .g = 0xFF, .b = 0x00}, .blink_cb = im_mm_rgb_blink_cb},
     {.index = IM_MM_RGB_BLINK_INDEX_2G4, .interval = 250, .times = 1, .color = {.r = 0x00, .g = 0xFF, .b = 0x00}, .blink_cb = im_mm_rgb_blink_cb},
-    {.index = IM_MM_RGB_BLINK_INDEX_W2M, .interval = 500, .times = 3, .color = {.r = 150, .g = 150, .b = 150}, .blink_cb = NULL},
-    {.index = IM_MM_RGB_BLINK_INDEX_W2H, .interval = 500, .times = 3, .color = {.r = 150, .g = 150, .b = 150}, .blink_cb = NULL},
     {.index = RGB_MATRIX_BLINK_INDEX_BAT, .interval = 250, .times = 3, .color = {.r = 0x00, .g = 0x00, .b = 0x00}, .blink_cb = bat_indicators_hook},
     {.index = RGB_MATRIX_BLINK_INDEX_ALL, .interval = 500, .times = 5, .color = {.r = 100, .g = 100, .b = 100}, .blink_cb = NULL},
 };
@@ -152,15 +150,17 @@ static bool bat_blink = false;
 static uint8_t battery_full_flag = 1;
 static uint8_t battery_chrg_flag = 1;
 static bool full_flag = false;
-static uint16_t laste_time_off = 0;
+static uint16_t bat_blink_timeout = 0;
 
 #ifdef RGB_MATRIX_BLINK_INDEX_BAT
 
 void bat_indicators_hook(uint8_t index) {
 
     if (mm_eeconfig.devs != DEVS_USB) {
-        if ((!mm_eeconfig.charging) && (bts_info.bt_info.pvol <= BATTERY_CAPACITY_LOW)) {
-            /* 低电提醒 */
+        if (bat_blink) {
+            bat_blink_timeout = timer_read();
+        }
+        if ((!mm_eeconfig.charging) && (bts_info.bt_info.pvol <= BATTERY_CAPACITY_LOW) && timer_elapsed(bat_blink_timeout) > 10000) {
             rgb_matrix_blink_set_color(RGB_MATRIX_BLINK_INDEX_BAT, RGB_RED);
             rgb_matrix_blink_set_interval_times(index, 500, 0x3);
             bat_blink = true;
@@ -170,16 +170,16 @@ void bat_indicators_hook(uint8_t index) {
             bat_blink = false;
         }
 
-        if ((bts_info.bt_info.pvol < 1U) && (!mm_eeconfig.charging)) {
-            if (laste_time_off == 0) laste_time_off = timer_read();
-            if (timer_elapsed(laste_time_off) > 10000) {
-                laste_time_off = 0;
-                im_set_power_off();
-            }
-        }
-        else {
-            laste_time_off = 0;
-        }
+        // if ((bts_info.bt_info.pvol < 1U) && (!mm_eeconfig.charging)) {
+        //     if (bat_blink_timeout == 0) bat_blink_timeout = timer_read();
+        //     if (timer_elapsed(bat_blink_timeout) > 10000) {
+        //         bat_blink_timeout = 0;
+        //         im_set_power_off();
+        //     }
+        // }
+        // else {
+        //     bat_blink_timeout = 0;
+        // }
     }
     else {
         bat_blink = false;
@@ -480,6 +480,17 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
         bat_statue = BAT_CHRGING;
     }
 
+    // if (battery_chrg_flag && chrg_flag && (!full_flag)) {
+    //     if (bts_info.bt_info.pvol < 33) {
+    //         rgb_matrix_set_color(RGB_MATRIX_BLINK_INDEX_BAT, RGB_RED);
+    //     }
+    //     else if (bts_info.bt_info.pvol < 66) {
+    //         rgb_matrix_set_color(RGB_MATRIX_BLINK_INDEX_BAT, RGB_ORANGE);
+    //     }
+    //     else {
+    //         rgb_matrix_set_color(RGB_MATRIX_BLINK_INDEX_BAT, RGB_GREEN);
+    //     }
+    // }
     // if (confinfo.no_gui) {
     //     rgb_matrix_set_color(2, 0xff, 0xff, 0xff);
     // }
