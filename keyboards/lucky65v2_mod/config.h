@@ -38,6 +38,7 @@
 
 
 // USB模式未插入USB时跟随无线模式一致，进行超时休眠
+// When USB mode is not plugged in, it follows the wireless mode and goes to sleep after timeout
 #    define MM_USB_AUTO_SLEEP_DISABLE
 #    define IM_MM_USB_TIMES 1
 
@@ -52,6 +53,7 @@
 
 #    define RGB_DRIVER_EN_PIN B12
 #    define IM_LKEY_COUNT 4 // 用户自定义长按按键数量
+                           // Number of user-customizable long-press keys
 
 #    define RGB_MATRIX_BLINK_COUNT 13
 #    define RGB_MATRIX_BLINK_INDEX_BAT 3
