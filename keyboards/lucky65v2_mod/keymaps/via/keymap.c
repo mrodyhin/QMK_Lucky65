@@ -305,14 +305,15 @@ bool im_loop_user(void) {
 
     if (timer_elapsed32(readbatTimer) >= 3000) {
         readbatTimer = timer_read32();
-        isBatteryCharging = !readPin(CHRG_PIN);
+        isBatteryCharging = !readPin(CHRG_PIN) || mm_eeconfig.charging;
         isBatteryFull = !readPin(FULL_PIN);
     }
     else {
         return true;
     }
 
-    if (bat_state == BAT_NORMAL) {
+    switch (bat_state) {
+    case BAT_NORMAL: {
         if (bts_info.bt_info.pvol <= BATTERY_CAPACITY_LOW) {
             bat_state = BAT_LOW;
         }
@@ -320,9 +321,8 @@ bool im_loop_user(void) {
             bat_state = BAT_CHARGING;
             bts_send_vendor(v_bat_charging);
         }
-    }
-
-    if (bat_state == BAT_CHARGING) {
+    } break;
+    case BAT_CHARGING: {
         if (isBatteryFull) {
             bat_state = BAT_FULL;
             bts_send_vendor(v_bat_full);
@@ -330,9 +330,8 @@ bool im_loop_user(void) {
         if (!isBatteryCharging) {
             bat_state = bts_info.bt_info.pvol <= BATTERY_CAPACITY_LOW ? BAT_LOW : BAT_NORMAL;
         }
-    }
-
-    if (bat_state == BAT_FULL) {
+    } break;
+    case BAT_FULL: {
         if (!isBatteryFull && isBatteryCharging) {
             bat_state = BAT_CHARGING;
             bts_send_vendor(v_bat_charging);
@@ -341,15 +340,15 @@ bool im_loop_user(void) {
             bat_state = BAT_NORMAL;
             bts_send_vendor(v_bat_stop_charging);
         }
-    }
-
-    if (bat_state == BAT_LOW) {
+    } break;
+    case BAT_LOW: {
         if (isBatteryCharging) {
             bat_state = BAT_CHARGING;
         }
         if (!isBatteryCharging && bts_info.bt_info.pvol > BATTERY_CAPACITY_LOW) {
             bat_state = BAT_NORMAL;
         }
+    } break;
     }
 
     return true;
@@ -499,10 +498,10 @@ bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
     }
 
     if (bat_state == BAT_CHARGING) {
-        if (bts_info.bt_info.pvol < 33) {
+        if (bts_info.bt_info.pvol < 40) {
             rgb_matrix_set_color(RGB_MATRIX_BLINK_INDEX_BAT, RGB_RED);
         }
-        else if (bts_info.bt_info.pvol < 66) {
+        else if (bts_info.bt_info.pvol < 90) {
             rgb_matrix_set_color(RGB_MATRIX_BLINK_INDEX_BAT, RGB_ORANGE);
         }
         else {
