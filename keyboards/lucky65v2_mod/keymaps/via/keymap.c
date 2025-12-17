@@ -146,11 +146,11 @@ typedef enum {
 } bat_statue_t;
 bat_statue_t bat_statue = BAT_NORMAL;
 
-static bool bat_blink = false;
+static bool bat_blink = false; // used in low battery indication
+static uint16_t bat_blink_timeout = 0; // used in low battery indication
 static uint8_t battery_full_flag = 1;
 static uint8_t battery_chrg_flag = 1;
 static bool full_flag = false;
-static uint16_t bat_blink_timeout = 0;
 
 #ifdef RGB_MATRIX_BLINK_INDEX_BAT
 
