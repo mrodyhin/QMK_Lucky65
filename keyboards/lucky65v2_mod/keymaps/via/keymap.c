@@ -141,16 +141,13 @@ blink_rgb_t blink_rgbs[RGB_MATRIX_BLINK_COUNT] = {
 typedef enum {
     BAT_NORMAL,
     BAT_LOW,
-    BAT_CHRGING,
+    BAT_CHARGING,
     BAT_FULL,
-} bat_statue_t;
-bat_statue_t bat_statue = BAT_NORMAL;
+} bat_state_t;
+bat_state_t bat_state = BAT_NORMAL;
 
 static bool bat_blink = false; // used in low battery indication
 static uint16_t bat_blink_timeout = 0; // used in low battery indication
-static uint8_t battery_full_flag = 1;
-static uint8_t battery_chrg_flag = 1;
-static bool full_flag = false;
 
 #ifdef RGB_MATRIX_BLINK_INDEX_BAT
 
@@ -160,11 +157,10 @@ void bat_indicators_hook(uint8_t index) {
         if (bat_blink) {
             bat_blink_timeout = timer_read();
         }
-        if ((!mm_eeconfig.charging) && (bts_info.bt_info.pvol <= BATTERY_CAPACITY_LOW) && timer_elapsed(bat_blink_timeout) > 10000) {
+        if (bat_state == BAT_LOW && timer_elapsed(bat_blink_timeout) > 10000) {
             rgb_matrix_blink_set_color(RGB_MATRIX_BLINK_INDEX_BAT, RGB_RED);
             rgb_matrix_blink_set_interval_times(index, 500, 0x3);
             bat_blink = true;
-            bat_statue = BAT_LOW;
         }
         else {
             bat_blink = false;
@@ -268,7 +264,7 @@ bool im_pre_init_user(void) {
     return true;
 }
 
-static uint32_t readbat = 0x00;
+static uint32_t readbatTimer = 0x00;
 // 初始化和参数相关的操作，在恢复出厂设置时此函数会被调用
 // Initialize and parameter related operations, this function will be called when restoring factory settings
 bool im_init_user(void) {
@@ -281,7 +277,7 @@ bool im_init_user(void) {
     if (!confinfo.raw) {
         eeconfig_confinfo_default();
     }
-    readbat = timer_read32();
+    readbatTimer = timer_read32();
     #ifdef RGB_MATRIX_BLINK_INDEX_BAT
     rgb_matrix_blink_set(RGB_MATRIX_BLINK_INDEX_BAT);
     #endif
@@ -299,30 +295,61 @@ bool im_reset_settings_user(void) {
 
     return true;
 }
-bool chrg_flag = false;
 // 无限循环
 // Infinite loop
+
 bool im_loop_user(void) {
 
-    if (timer_elapsed32(readbat) >= 3000) {
-        readbat = timer_read32();
-        battery_chrg_flag = readPin(CHRG_PIN);
-        battery_full_flag = readPin(FULL_PIN);
+    bool isBatteryCharging = false;
+    bool isBatteryFull = false;
+
+    if (timer_elapsed32(readbatTimer) >= 3000) {
+        readbatTimer = timer_read32();
+        isBatteryCharging = !readPin(CHRG_PIN);
+        isBatteryFull = !readPin(FULL_PIN);
+    }
+    else {
+        return true;
     }
 
-    if ((!mm_eeconfig.charging) && full_flag) {
-        full_flag = false;
+    if (bat_state == BAT_NORMAL) {
+        if (bts_info.bt_info.pvol <= BATTERY_CAPACITY_LOW) {
+            bat_state = BAT_LOW;
+        }
+        if (isBatteryCharging) {
+            bat_state = BAT_CHARGING;
+            bts_send_vendor(v_bat_charging);
+        }
     }
 
-    if ((chrg_flag) && (!battery_full_flag)) {
-        if (bat_statue != BAT_FULL) bts_send_vendor(v_bat_full);
-        full_flag = true;
-        bat_statue = BAT_FULL;
+    if (bat_state == BAT_CHARGING) {
+        if (isBatteryFull) {
+            bat_state = BAT_FULL;
+            bts_send_vendor(v_bat_full);
+        }
+        if (!isBatteryCharging) {
+            bat_state = bts_info.bt_info.pvol <= BATTERY_CAPACITY_LOW ? BAT_LOW : BAT_NORMAL;
+        }
     }
 
-    if ((!mm_eeconfig.charging) && (bat_statue != BAT_LOW)) {
-        if (bat_statue != BAT_NORMAL) bts_send_vendor(v_bat_stop_charging);
-        bat_statue = BAT_NORMAL;
+    if (bat_state == BAT_FULL) {
+        if (!isBatteryFull && isBatteryCharging) {
+            bat_state = BAT_CHARGING;
+            bts_send_vendor(v_bat_charging);
+        }
+        if (!isBatteryCharging) {
+            bat_state = BAT_NORMAL;
+            bts_send_vendor(v_bat_stop_charging);
+        }
+    }
+
+    if (bat_state == BAT_LOW) {
+        if (isBatteryCharging) {
+            bat_state = BAT_CHARGING;
+        }
+        if (!isBatteryCharging && bts_info.bt_info.pvol > BATTERY_CAPACITY_LOW) {
+            bat_state = BAT_NORMAL;
+        }
     }
 
     return true;
@@ -467,33 +494,25 @@ bool im_process_record_user(uint16_t keycode, keyrecord_t* record) {
 #endif
 
 bool rgb_matrix_indicators_advanced_user(uint8_t led_min, uint8_t led_max) {
-
-
     if (host_keyboard_led_state().caps_lock) {
         rgb_matrix_set_color(36, 0xff, 0xff, 0xff);
     }
 
-    if ((!battery_chrg_flag) && (!full_flag)) {
-        if (bat_statue != BAT_CHRGING) bts_send_vendor(v_bat_charging);
+    if (bat_state == BAT_CHARGING) {
+        if (bts_info.bt_info.pvol < 33) {
+            rgb_matrix_set_color(RGB_MATRIX_BLINK_INDEX_BAT, RGB_RED);
+        }
+        else if (bts_info.bt_info.pvol < 66) {
+            rgb_matrix_set_color(RGB_MATRIX_BLINK_INDEX_BAT, RGB_ORANGE);
+        }
+        else {
+            rgb_matrix_set_color(RGB_MATRIX_BLINK_INDEX_BAT, RGB_GREEN);
+        }
+    }
+    else if (bat_state == BAT_FULL) {
         rgb_matrix_set_color(RGB_MATRIX_BLINK_INDEX_BAT, RGB_BLUE);
-        chrg_flag = true;
-        bat_statue = BAT_CHRGING;
     }
 
-    // if (battery_chrg_flag && chrg_flag && (!full_flag)) {
-    //     if (bts_info.bt_info.pvol < 33) {
-    //         rgb_matrix_set_color(RGB_MATRIX_BLINK_INDEX_BAT, RGB_RED);
-    //     }
-    //     else if (bts_info.bt_info.pvol < 66) {
-    //         rgb_matrix_set_color(RGB_MATRIX_BLINK_INDEX_BAT, RGB_ORANGE);
-    //     }
-    //     else {
-    //         rgb_matrix_set_color(RGB_MATRIX_BLINK_INDEX_BAT, RGB_GREEN);
-    //     }
-    // }
-    // if (confinfo.no_gui) {
-    //     rgb_matrix_set_color(2, 0xff, 0xff, 0xff);
-    // }
     return true;
 }
 #endif
